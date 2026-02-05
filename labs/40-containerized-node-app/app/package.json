@@ -8,6 +8,7 @@
   "main": "server.js",
   "scripts": {
     "test": "node --test tests/*.test.js",
+    "lint": "npx standard",
     "dev": "nodemon --ext js,hbs server.js | pino-pretty",
     "start": "node server.js | pino-pretty"
   },
