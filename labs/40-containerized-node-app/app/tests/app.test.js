@@ -9,6 +9,6 @@ test('GET /health returns ok', async () => {
     url: '/health'
   })
   assert.strictEqual(response.statusCode, 200)
-
+  assert.match(response.headers['content-type'], /application\/json/)
   assert.deepStrictEqual(JSON.parse(response.body), { ok: true })
 })
