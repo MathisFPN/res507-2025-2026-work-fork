@@ -23,7 +23,6 @@ jobs:
 
       - name: Run tests if present
         working-directory: labs/40-containerized-node-app/app
-        continue-on-error: true
         run: npm test --if-present
 
       - name: Build Docker image
