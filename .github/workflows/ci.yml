@@ -5,15 +5,11 @@ on:
   pull_request:
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "24"
 
@@ -21,39 +17,43 @@ jobs:
         working-directory: labs/40-containerized-node-app/app
         run: npm ci
 
-      - name: Lint code
+      - name: Lint
         working-directory: labs/40-containerized-node-app/app
         run: npm run lint --if-present
 
-      - name: Run tests if present
+      - name: Run tests
         working-directory: labs/40-containerized-node-app/app
-        run: npm test --if-present
+        run: npm test
+
+  build-and-verify:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: |
-          cd labs/40-containerized-node-app
-          docker build -t quote-app -f docker/Dockerfile .
+        working-directory: labs/40-containerized-node-app
+        run: docker build -t quote-app -f docker/Dockerfile ./app
 
-      - name: Run container
+      - name: Run & Health Check
         run: |
           docker run -d --name quote-app -p 3000:3000 quote-app
-          echo "Waiting for health check (max 15s)..."
+          # Script de santé strict (Lane A)
           for i in $(seq 1 15); do
-            if curl -fsS http://localhost:3000/health >/dev/null; then
-              echo "Health check passed"
+            if curl -s http://localhost:3000/health | grep -q "ok"; then
+              echo "Healthy!"
               exit 0
             fi
             sleep 1
           done
-          echo "ERROR: Health check failed or timed out"
-          echo "--- Container Status ---"
-          docker ps -a
-          echo "--- Port Listening ---"
-          sudo netstat -tulpn | grep :3000 || echo "Port 3000 not bound"
-          echo "--- Container Logs ---"
           docker logs quote-app
           exit 1
 
-      - name: Stop container
-        if: always()
-        run: docker rm -f quote-app || true
+  pr-security-check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit dependencies
+        working-directory: labs/40-containerized-node-app/app
+        run: npm audit --audit-level=high
