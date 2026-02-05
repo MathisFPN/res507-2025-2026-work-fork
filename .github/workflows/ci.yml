@@ -4,10 +4,10 @@ on:
   push:
   pull_request:
 
-
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -23,12 +23,12 @@ jobs:
 
       - name: Run tests if present
         working-directory: labs/40-containerized-node-app/app
-        run: npm test
+        run: npm test --if-present
 
       - name: Build Docker image
-        working-directory: labs/40-containerized-node-app
-        run: docker build -t quote-app -f docker/Dockerfile .
-
+        run: |
+          cd labs/40-containerized-node-app
+          docker build -t quote-app -f docker/Dockerfile .
 
       - name: Run container
         run: |
@@ -46,5 +46,4 @@ jobs:
 
       - name: Stop container
         if: always()
-        run: |
-          docker rm -f quote-app || true
+        run: docker rm -f quote-app || true
