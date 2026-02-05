@@ -33,7 +33,7 @@ jobs:
 
       - name: Build Docker image
         working-directory: labs/40-containerized-node-app
-        run: docker build -t quote-app -f docker/Dockerfile ./app
+        run: docker build -t quote-app -f labs/40-containerized-node-app/docker/Dockerfile .
 
       - name: Run & Health Check
         run: |
