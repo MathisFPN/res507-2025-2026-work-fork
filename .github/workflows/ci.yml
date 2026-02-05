@@ -22,8 +22,9 @@ jobs:
         run: npm ci
 
       - name: Run tests if present
-        working-directory: labs/40-containerized-node-app/tests
+        working-directory: labs/40-containerized-node-app/
         run: npm test --if-present
 
       - name: Build Docker image
+        working-directory: labs/40-containerized-node-app
         run: docker build -t quote-app -f docker/Dockerfile .
