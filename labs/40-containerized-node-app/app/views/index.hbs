@@ -5,37 +5,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>QuoteBoard</title>
-  <style>
-    body {
-      font-family: system-ui, sans-serif;
-      max-width: 700px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-      background: #111;
-      color: #eee;
-    }
-
-    form {
-      display: grid;
-      gap: .5rem;
-      margin-bottom: 2rem;
-    }
-
-    input,
-    textarea,
-    button {
-      font: inherit;
-      margin-top: 0.5rem;
-    }
-
-    .quote {
-      margin-bottom: 1rem;
-    }
-  </style>
+<link rel="stylesheet" href="/public/style.css" />
 </head>
 
 <body>
-  <h1>QuoteBoard</h1>
+  <h1>QuoteBoard v2 - Rollout Test</h1>
 
   <form method="post" action="/quotes">
     <input name="author" placeholder="Author (optional)" />
@@ -51,7 +25,7 @@
   </div>
   {{/each}}
   {{else}}
-  <p>No quotes yet. Add the first one.</p>
+  <p>No quotes yet. Add the first one. boum</p>
   {{/if}}
 </body>
 

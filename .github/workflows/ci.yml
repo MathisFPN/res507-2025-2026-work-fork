@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install dependencies
+        working-directory: labs/40-containerized-node-app/app
+        run: npm ci
+
+      - name: Lint code
+        working-directory: labs/40-containerized-node-app/app
+        run: npm run lint --if-present
+
+      - name: Run tests if present
+        working-directory: labs/40-containerized-node-app/app
+        run: npm test --if-present
+
+  docker:
+    needs: validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          cd labs/40-containerized-node-app
+          docker build -t quote-app -f docker/Dockerfile .
+
+      - name: Run container
+        run: |
+          docker run -d --name quote-app -p 3000:3000 quote-app
+          echo "Waiting for health check (max 15s)..."
+          for i in $(seq 1 15); do
+            if curl -fsS http://localhost:3000/health >/dev/null; then
+              echo "Health check passed"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "ERROR: Health check failed or timed out"
+          docker ps -a
+          docker logs quote-app
+          exit 1
+
+      - name: Stop container
+        if: always()
+        run: docker rm -f quote-app || true
