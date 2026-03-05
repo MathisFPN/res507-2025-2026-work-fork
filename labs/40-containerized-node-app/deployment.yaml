@@ -24,7 +24,7 @@ spec:
           imagePullPolicy: Never
           env:
             - name: DATABASE_URL
-              value: postgres://postgres:postgres@db:5432/postgres
+              value: "postgres://quote:quote@db:5432/postgres"
             - name: PORT
               value: "3000"
           ports:
